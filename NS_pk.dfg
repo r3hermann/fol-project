@@ -1,4 +1,4 @@
-begin_problem(needham_schroeder_asimmetrico_in_FOL). brbrbrbr
+begin_problem(needham_schroeder_asimmetrico_in_FOL).
 
 list_of_descriptions.
 name({*needham schroeder public key protocol*}).
@@ -10,9 +10,9 @@ end_of_list.
 
 list_of_symbols.
 	
-	functions[(sent,3), (pair,2), (encr,2), (key,2), (PKa,0), (PKb,0), (PKttp,0), (SKttp,0),  (a,0), (t,0), (b,0), (na,0), (nb,0)].
+	functions[(sent,3), (pair,2), (encr,2), (key,2), (PublicKa,0), (PublicKb,0), (PublicKttp,0), (SecretKttp,0),  (a,0), (t,0), (b,0), (na,0), (nb,0)].
 		
-	predicates[(Message,1), (Sid,1), (Ak,1), (Bk,1), (Tk,1), (Nonce,2), (Sa,1), (Sb,1)].
+	predicates[(Message,1), (Afreshness,1), (Bfreshness,1), (Ak,1), (Bk,1), (Tk,1), (Nonce,2), (Sa,1), (Sb,1)].
 
 end_of_list.
 
@@ -21,84 +21,105 @@ list_of_formulae(axioms).
 
 %USER A
 
-	%A deteniene la PK del ttp
-	formula( Ak(key(PKttp, t)) ).
+	%A deteniene la public key del server ttp
+	formula( Ak(key(PublicKttp, t)) ).
 	
+	% A e' interessato solo alle nonce che sono fresh
+	
+	formula( Afreshness(nb) ).
 
 
 	%1
-	% A vuole comunicare con B e fa richiesta al TTP. A mette in storage
+	% A vuole comunicare con B e fa richiesta al TTP. A mette in storage Sa
 	% l'identita' con cui vuole comunicare
 	
 	formula(and (Message(sent(a, t, pair(a,b))), Sa(b) )).
     
     
     %3
-    % A, salva in storage na associata ad xb per verificare se al passo 6 del protocollo
-    % e da questo momento deteniene la PK di xb
-	formula( forall( [xt, xPKttp, xPKb, xb], implies( and (Message(sent(xt, a, encr( pair( xPKb, xb), SKttp) )), Ak(key(xPKttp, xt)) ),
-										and( Message(sent( a, b, encr( pair(na, a), PKb))), Sa(pair(xb, na)), Ak(key(xPKb, xb))) ))).
+    % A riceve un messaggio dal server TTP e lo decifra usando la chiave PublicKttp ( A possiede la public
+    % key del TTP). Se questa operazione ha successo A controlla nel suo storage Sa se l'identita' xb corrisponde
+    % a B. Dopo di che A manda un messaggio ad xb contenente la nonce di A, na, insieme alla sua identita' cifrato
+    % la chiave xPublickb. Ora A possiede la chiave pubblica xPublicb di xb e ha associata la sua nonce con
+    % l'identita' xb
+    
+    formula( forall( [xPublicKb, xb], implies( and (Message(sent(t, a, encr( pair( xPublicKb, xb), SecretKttp) )), Sa(b)  ),
+										and( Message(sent( a, xb, encr( pair(na, a), xPublicKb))), Sa(pair(xb, na)), Ak(key(xPublicKb, xb))) ))).
 	
 	
-	%7 A riceve la nonce di xb e la conserva, fa un check per verificare se la propria nonce e'
-	% la stessa che aveva mandato in origine ad xb
+	%7
+	% A riceve un messaggio da xb contente la sua nonce e quella di xb, xnb. A fa un check per verificare se la propria
+	% nonce e' la stessa che aveva mandato in origine ad B e se la nonce xnb e' fresh per A allora manda ad xb la sua stessa
+	% nonce xnb cifrata con la chiave pubblica di xb. Da questo momento A detiene la nonce di B
 	
-	formula( forall( [xb, xna, xnb, xPKa, xPKb], implies( and( Message( sent( xb, a, encr( pair(xna, xnb), xPKa))), Sa(pair(xb, xna))),  
-									and ( Message( sent( a, xb, encr(xnb, xPKb))), Nonce(xnb, xb)) ))).
+	formula( forall( [xb, xna, xnb, xPublicKb], implies( and( Message( sent( xb, a, encr( pair(xna, xnb), PublicKa))), Afreshness(xnb),
+																	Sa(pair(xb, xna))),  
+												and ( Message( sent( a, xb, encr(xnb, xPublicKb))), Nonce(xnb, xb)) ))).
 									
 
 %SERVER TTP
 
-	%TTP detiene le Pubkey di A e B
-	formula( and( Tk(key(PKa, a)), Tk(key(PKb, b)) )).
+	%TTP detiene le public key di A e B
+	formula( and( Tk(key(PublicKa, a)), Tk(key(PublicKb, b)) )).
 	
 	
 	%2
-	% il TTP riceve una richiesta di comunicazione per un certo xb
+	% il TTP riceve una richiesta di comunicazione per un certo xb da un mittente xa: il server controlla
+	% se e' in possesso della chiave xPuplicb per l'identita' xb. Se le condizioni sono soddisfatte il TTP
+	%risponde inviando public key di xb con l'identita' xb
 	
-	formula( forall( [xa, xb, xPKb], implies( and(Message(sent(xa, t, pair(xa, xb))), Tk(key(xPKb,xb)) ),
-									  Message(sent(t, xa, encr( pair( xPKb, xb), SKttp)) ) ) )).
+	formula( forall( [xa, xb, xPublicKb], implies( and(Message(sent(xa, t, pair(xa, xb))), Tk(key(xPublicKb,xb)) ),
+									  Message(sent(t, xa, encr( pair( xPublicKb, xb), SecretKttp)) ) ) )).
 									  
 	
 	%5
-	% richiesta di un certo xb della chiave xPKa
+	% il server vede una richiesta di un certo xb della chiave xPublicKa. Il server controlla se ha la
+	% chiave che corrisponde all'identita' xa e se ha anche la chiave dell'identita' xb. 
 	
-	formula( forall( [xb, xa, xPKa, xPKb], implies( and( Message(sent(xb, t, pair(xb, xa))), Tk(key(xPKa, xa)), Tk(key(xPKb, xb))),
-										Message( sent(t, xb, encr( pair( xPKa, xa), SKttp))) ))).
+	formula( forall( [xb, xa, xPublicKa, xPublicKb], implies( and( Message(sent(xb, t, pair(xb, xa))),
+																	Tk(key(xPublicKa, xa)), Tk(key(xPublicKb, xb))),
+													Message( sent(t, xb, encr( pair( xPublicKa, xa), SecretKttp))) ))).
 
 %USER B
 
-	% B deteniene la PK del ttp
-	formula( Bk(key(PKttp, t)) ).	
+	% B deteniene la public key del ttp
 	
-	% la nonce di xa e' fresh per B
-	%Bf(na)
+	formula( Bk(key(PublicKttp, t)) ).	
 	
-
+	% B e' interessato solo alle nonce che sono fresh
+	
+	formula( Bfreshness(na) ).
 	
 	%4
-	% B riceve un messaggio da xa, vede che è di A e richiede la sua chiave pubblica al server,
-	% inoltre B conserva in storage la nonce xna di xa
+	% B riceve un messaggio da un xa, se nonce appena ricevuta e' freshness la mette in storage e
+	% richiede al TTP la chiave xPublicKa di xa
 	
-	formula( forall( [xa, xna], implies( Message( sent( xa, b, encr( pair(xna, xa), PKb))),
+	formula( forall( [xa, xna], implies( and ( Message( sent( xa, b, encr( pair(xna, xa), PublicKb))), Bfreshness(xna)),
 											 and( Message( sent( b, t, pair(b, xa) ) ), Sb(pair(xna, xa))) ))).
 											 
 
-	%6 
-	formula( forall( [xa, xna, xSKttp, xt, xPKa], implies( Message(sent( xt, b, encr( pair( xPKa, xa), xSKttp))),
-												and ( Message(sent( b, xa, encr( pair(xna, nb), xPKa))), Sb(pair(xa,nb))) ))).
+	%6
+	% B riceve risposta dal TTP contenente la chiave pubblica di xa e l'identita' xa e manda un
+	% messaggio ad xa contenete la nonce xna precedentemente conservata in storage e la nonce nb di B,
+	% il tutto cifrato con la chiave pubblica di xa. B mette in storage, Sb, la sua nonce e da questo
+	% momento detiene la chiave pubblica di xa 
+	
+	formula( forall( [xa, xna, xPublicKa], implies( Message(sent( t, b, encr( pair( xPublicKa, xa), SecretKttp))),
+															and ( Message(sent( b, xa, encr( pair(xna, nb), xPublicKa))),
+															Sb(pair(xa,nb)), Bk( key(xPublicKa, xa)) )))).
 												
 												
 	%end
-	formula( forall( [xa, xnb, xna, xb, xPKb], implies( and ( Message( sent ( xa, b, encr( xnb, PKb))), Sb(pair(xa, xnb))),
+	% B si vede arrivare come risposta un messaggio contenente la sua stessa nonce nb che aveva mandato 
+	% nel messaggio precedente. Ora anche B deteniene la nonce di A
+	
+	formula( forall( [xa, xnb, xna, xb, xPublicKb], implies( and ( Message( sent ( xa, b, encr( xnb, PublicKb))), Sb(pair(xa, xnb))),
 														Nonce(xna, xb) ))).
 														
 end_of_list.
 
 
 list_of_formulae(conjectures).
-
-	%formula( exists ( [x], and ( Nonce(x, b), Nonce(x, a))) ).
 	
 	formula( and (Nonce(nb, a), Nonce(na, b))).
 
