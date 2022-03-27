@@ -16,8 +16,8 @@ list_of_symbols.
 end_of_list.
 
 
-list_of_formulae(axioms).
 
+list_of_formulae(axioms).
 
 %USER A
 
