@@ -7,7 +7,6 @@ status(unknown).
 description({*needham schroeder asymmetric*}).
 end_of_list.
 
-
 list_of_symbols.
 	
 	functions[(sent,3), (pair,2), (encr,2), (key,2), (PublicKa,0), (PublicKb,0), (PublicKttp,0), (SecretKttp,0),  (a,0), (t,0), (b,0), (na,0), (nb,0)].
