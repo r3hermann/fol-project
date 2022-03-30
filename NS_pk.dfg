@@ -7,17 +7,41 @@ status(unknown).
 description({*needham schroeder asymmetric*}).
 end_of_list.
 
+
 list_of_symbols.
 	
-	functions[(sent,3), (pair,2), (encr,2), (key,2), (PublicKa,0), (PublicKb,0), (PublicKttp,0), (SecretKttp,0),  (a,0), (t,0), (b,0), (na,0), (nb,0)].
+	% i parametri di input delle funzioni e dei predicati indicata la loro arieta'
+	
+	
+	functions[(sent,3), (pair,2), (encr,2), (key,2), (PublicKa,0), (PublicKb,0), (PublicKttp,0), (SecretKttp,0), (a,0), (t,0), (b,0), (na,0), (nb,0)].
+	
+	
+	% sent(sender, receiver, mesg ): msg viene spedito dal sender e mandato al receiver
+	% encr(mesg, key): cifratura del mesg usando la chiave key
+	% pair: e' il contenuto delle componenti di mesg da cifrare
+	% PublicKa, PublicKb, PublicKttp: chiavi pubbliche degli user e del server TTP
+	% SecretKttp: chiave privata del server TTP
+	% key(_,_): indica l'identita' e chiave dell'indentita' che si sta applicando
+	% a, b e t: user e server TTP
+	% na e nb: nonce degli user
+	
+
+
 		
 	predicates[(Message,1), (Afreshness,1), (Bfreshness,1), (Ak,1), (Bk,1), (Tk,1), (Nonce,2), (Sa,1), (Sb,1)].
+	
+	% Sa(_), Sb(_): indica lo store locale degli user
+	% Message(mesg): rappresenta il mesg che si vuole spedire
+	% Afreshness e Bfreshness: indicano la proprieta' di freshness
+	% AK(_), Bk(_) e Tk(_): indicano le chiavi che si detengono
+	% Nonce(_): indica la nonce che si sta detenendo
+
 
 end_of_list.
 
-
-
+%in prefix notation.
 list_of_formulae(axioms).
+
 
 %USER A
 
@@ -30,7 +54,7 @@ list_of_formulae(axioms).
 
 
 	%1
-	% A vuole comunicare con B e fa richiesta al TTP. A mette in storage Sa
+	% A vuole comunicare con B e fa richiesta al TTP e mette in storage Sa
 	% l'identita' con cui vuole comunicare
 	
 	formula(and (Message(sent(a, t, pair(a,b))), Sa(b) )).
