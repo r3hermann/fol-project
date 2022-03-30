@@ -30,6 +30,7 @@ list_of_symbols.
 		
 	predicates[(Message,1), (Afreshness,1), (Bfreshness,1), (Ak,1), (Bk,1), (Tk,1), (Nonce,2), (Sa,1), (Sb,1)].
 	
+	
 	% Sa(_), Sb(_): indica lo store locale degli user
 	% Message(mesg): rappresenta il mesg che si vuole spedire
 	% Afreshness e Bfreshness: indicano la proprieta' di freshness
@@ -39,7 +40,8 @@ list_of_symbols.
 
 end_of_list.
 
-%in prefix notation.
+%la scrittura del codice e' in prefix notation.
+
 list_of_formulae(axioms).
 
 
