@@ -18,7 +18,7 @@ list_of_symbols.
 	
 	% sent(sender, receiver, mesg ): msg viene spedito dal sender e mandato al receiver
 	% encr(mesg, key): cifratura del mesg usando la chiave key
-	% pair: e' il contenuto delle componenti di mesg da cifrare
+	% pair(_,_): e' il contenuto delle componenti di mesg da cifrare
 	% PublicKa, PublicKb, PublicKttp: chiavi pubbliche degli user e del server TTP
 	% SecretKttp: chiave privata del server TTP
 	% key(_,_): indica l'identita' e chiave dell'indentita' che si sta applicando
@@ -33,7 +33,7 @@ list_of_symbols.
 	
 	% Sa(_), Sb(_): indica lo store locale degli user
 	% Message(mesg): rappresenta il mesg che si vuole spedire
-	% Afreshness e Bfreshness: indicano la proprieta' di freshness
+	% Afreshness(_) e Bfreshness(_): indicano la proprieta' di freshness
 	% AK(_), Bk(_) e Tk(_): indicano le chiavi che si detengono
 	% Nonce(_): indica la nonce che si sta detenendo
 
