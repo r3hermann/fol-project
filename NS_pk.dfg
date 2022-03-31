@@ -87,8 +87,8 @@ list_of_formulae(axioms).
 	% A fa un check per verificare se la propria nonce e' la stessa che aveva mandato in origine ad B e se la nonce xnb e' fresh per
 	% A allora manda ad xb la sua stessa nonce xnb cifrata con la chiave pubblica di xb. Da questo momento A detiene la nonce di B
 	
-	formula( forall( [xb, xna, xnb], implies( Message( sent( xb, a, encr( pair(xna, xnb), PublicKa))),  
-																					Plaintext(decrypt(pair(xna, xnb), SecretKa))  ))).
+	formula( forall( [xb, xna, xnb], implies( Message( sent( xb, a, encr( pair(xna, xnb), PublicKa))),
+																				Plaintext(decrypt(pair(xna, xnb), SecretKa))  ))).
 
 	formula( forall( [xb, xna, xnb, xPublicKb], implies( and(Plaintext(decrypt(pair(xna, xnb), SecretKa)), Afreshness(xnb),
 															 Sa(pair(xb, xna))),  
