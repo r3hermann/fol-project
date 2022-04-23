@@ -17,13 +17,15 @@ list_of_symbols.
 																 (SecretKb,0), (SecretKttp,0), (a,0), (t,0), (b,0), (na,0), (nb,0)].
 	
 	
-	% sent(sender, receiver, mesg ): msg viene spedito dal sender e mandato al receiver
-	% encr(mesg, key): cifratura del mesg usando la chiave key
-	% decrypt(mesg, key): decifratura del mesg con la chiave key
-	% pair(_,_): e' il contenuto delle componenti di mesg da cifrare
+	% @paramx: argomento che dipende dallo step del protocollo
+	%
+	% sent(sender, receiver, param ): rappresenta un messaggio, param, spedito dal sender e mandato al receiver
+	% encr(param, key): cifratura di un messasggio, param, usando la chiave key
+	% decrypt(param, key): decifratura del messaggio, param, con la chiave key
+	% pair(param1, param2): e' una coppia che indica il contenuto di un messaggio (es. (a,b), (a, na), ...)
 	% PublicKa, PublicKb, PublicKttp: chiavi pubbliche degli user e del server TTP
 	% SecretKa, SecretKb e SecretKttp: chiavi privata del server TTP
-	% key(_,_): indica l'identita' e chiave dell'indentita' che si sta applicando
+	% key(key, identita'): indica la coppia key e indentita' associata alla key
 	% a, b e t: user e server TTP
 	% na e nb: nonce degli user
 	
@@ -33,12 +35,15 @@ list_of_symbols.
 	predicates[(Message,1), (Plaintext,1), (Afreshness,1), (Bfreshness,1), (Ak,1), (Bk,1), (Tk,1), (Nonce,2), (Sa,1), (Sb,1)].
 	
 	
-	% Sa(_), Sb(_): indica lo store locale degli user
-	% Message(_): rappresenta il mesg cifrato che si vuole spedire
-	% Plaintext(_): indica un messaggio decifrato
-	% Afreshness(_) e Bfreshness(_): indicano la proprieta' di freshness
-	% AK(_), Bk(_) e Tk(_): indicano le chiavi che si detengono
-	% Nonce(_): indica la nonce che si sta detenendo
+	% @paramx: argomento che dipende dallo step del protocollo
+	%	
+	% Sa(param), Sb(param): store locale degli user in cui salvono delle informazioni come identita' e nonce in base al messaggio
+	% Message(sent(sender, receiver, mesg )): rappresenta il messaggio che si vuole spedire
+	% Plaintext(decrypt(pair(param1, param2), key)): messaggio decifrato usando key. Il contenuto del messaggio e' dato da pair
+	% Afreshness(nb) e Bfreshness(na): indicano la proprieta' di freshness delle nonce
+	% AK(key(key, identita')), Bk(key(key, identita')) e Tk(key(key, identita')): indicano le key associate all'identita' che si detengono
+	% Nonce(xn, identita'): indica che si detiene la nonce associata all'identita' specificata
+	
 
 
 end_of_list.
